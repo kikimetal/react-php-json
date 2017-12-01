@@ -1,4 +1,6 @@
 # KIKIMETAL Portfolio Page
-- home === about
-- website
-- illust
+- Home === About
+- Works
+  - WebSite
+- PlayGround
+  - graffiti

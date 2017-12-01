@@ -4,5 +4,4 @@ __build
 build
 img
 image
-css
-js
+*bundle*

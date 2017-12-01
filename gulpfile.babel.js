@@ -1,7 +1,7 @@
 // deployment dir name
-const deploymentDir = "__dist"
-// html file
-const indexHtml = "index.html"
+const deploymentDir = "__build"
+// index file
+const indexHtml = "index.php"
 // entry point js file name
 const indexJs = "index.js"
 // bundle js file name
@@ -23,7 +23,10 @@ import cleanCSS from "gulp-clean-css"
 import autoprefixer from "gulp-autoprefixer"
 
 gulp.task("sass-compile-components", ()=>{
-    return gulp.src("./css/src/components/*.sass")
+    return gulp.src([
+      "./css/src/components/*.sass",
+      "./css/src/components/*.scss",
+    ])
         .pipe(sass({
             outputStyle: "expanded",
         }))
@@ -37,9 +40,10 @@ gulp.task("sass-compile-components", ()=>{
 
 gulp.task("sass-compile-common", () => {
     return gulp.src([
-        "./css/src/common/myreset.sass",
+        "./css/src/common/myreset.css",
         "./css/src/common/common.sass",
         "./css/src/common/*.sass",
+        "./css/src/common/*.scss",
     ])
         .pipe(sass({
             outputStyle: "expanded",
@@ -86,13 +90,13 @@ gulp.task("css-min",
     }
 )
 
-gulp.task("browserify-index", ()=>{
+gulp.task("browserify", ()=>{
     return browserify({
         entries: [`./js/src/${indexJs}`],
         debug: true,
     })
         .transform(babelify, {
-            presets: ["latest", "react"],
+            presets: ["es2015", "react"],
         })
         .bundle()
         .on("error", function (err) { console.log("Error : " + err.message) })
@@ -100,12 +104,12 @@ gulp.task("browserify-index", ()=>{
         .pipe(gulp.dest("./js/"))
 })
 
-gulp.task("browserify-index-min", ()=>{
+gulp.task("browserify-min", ()=>{
     return browserify({
         entries: [`./js/src/${indexJs}`],
     })
         .transform(babelify, {
-            presets: ["latest", "react"],
+            presets: ["es2015", "react"],
         })
         .bundle()
         .pipe(source(bundleIndexMinJs)) // 出力ファイル名を指定
@@ -124,13 +128,15 @@ gulp.task("clean", (callback)=>{
     ], callback)
 })
 
-gulp.task("dist", // deployment index
+gulp.task("build", // deployment index
     [
         "clean",
         "apply-prod-environment",
         "css-min",
-        "browserify-index-min",
+        "browserify-min",
     ], ()=>{
+        gulp.src(`./routes.json`)
+            .pipe(gulp.dest(`./${deploymentDir}/`))
         gulp.src(`./${indexHtml}`)
             .pipe(gulp.dest(`./${deploymentDir}/`))
         gulp.src(`./image/**/*`)
@@ -147,11 +153,11 @@ gulp.task("watch", ["default"], ()=>{
         "css",
     ])
     gulp.watch("./js/src/**/*.js", [
-        "browserify-index",
+        "browserify",
     ])
 })
 
 gulp.task("default", [
     "css",
-    "browserify-index",
+    "browserify",
 ])
