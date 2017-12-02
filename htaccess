@@ -1,0 +1,15 @@
+SetEnvIf REDIRECT_HTTPS (.*) HTTPS=$1 
+<IfModule mod_rewrite.c>
+  RewriteEngine on
+  RewriteCond %{ENV:HTTPS} !on
+  RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.php [L]
+ </IfModule>
